@@ -1,4 +1,4 @@
-<div class="w-full min-h-screen flex flex-col gap-8 justify-center items-center">
+<div class="w-full flex flex-col gap-8 justify-center items-center">
     <div class="border-8 border-slate-300 bg-slate-100 text-slate-800 text-center w-full max-w-3xl p-4">
         {{ $user->name }} ({{ $user->email }})
     </div>
@@ -11,11 +11,11 @@
             </div>
         </div>
         <div>
-            <div class="h-64 w-64 rounded-full border-8 border-emerald-300 bg-emerald-100 text-emerald-800 flex justify-center items-center text-center text-2xl">
+            <a href="{{ route('overtime.index') }}" class="h-64 w-64 rounded-full border-8 border-emerald-300 bg-emerald-100 text-emerald-800 flex justify-center items-center text-center text-2xl transition-all hover:scale-105">
                 時間外勤務<br>
                 休日出勤<br>
                 申請
-            </div>
+            </a>
         </div>
         <div>
             <div class="h-64 w-64 rounded-full border-8 border-amber-300 bg-amber-100 text-amber-800 flex justify-center items-center text-center text-2xl">

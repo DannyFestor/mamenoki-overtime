@@ -14,6 +14,8 @@ class OvertimeConfirmation extends Model
         'user_id',
         'year',
         'month',
+        'remarks',
+        'transfer_remarks',
         'confirmed_at',
     ];
 
