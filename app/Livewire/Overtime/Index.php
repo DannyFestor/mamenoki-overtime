@@ -23,6 +23,8 @@ class Index extends Component
     #[Url]
     public int $month;
 
+    public array $overtimeConfirmations = [];
+
     public function mount()
     {
         if (!isset($this->year)) {
@@ -48,6 +50,13 @@ class Index extends Component
         }
 
         $this->name = \Auth::user()->name;
+
+        $this->overtimeConfirmations = OvertimeConfirmation::query()
+            ->where(['user_id' => \Auth::user()->id])
+            ->orderBy('year', 'desc')
+            ->orderBy('month', 'desc')
+            ->get()
+            ->toArray();
     }
 
     public function render()
@@ -125,13 +134,23 @@ class Index extends Component
     #[Computed]
     public function japaneseYear(): string
     {
-        $formatter = new IntlDateFormatter('ja_JP@calendar=japanese', IntlDateFormatter::FULL,
-            IntlDateFormatter::NONE, 'Asia/Tokyo', IntlDateFormatter::TRADITIONAL);
+        $formatter = new IntlDateFormatter(
+            'ja_JP@calendar=japanese', IntlDateFormatter::FULL,
+            IntlDateFormatter::NONE, 'Asia/Tokyo', IntlDateFormatter::TRADITIONAL
+        );
 
         $dateString = $formatter->format(Carbon::parse($this->year . '-' . $this->month));
 
         $dateString = substr($dateString, 0, strpos($dateString, '年'));
 
         return $dateString;
+    }
+
+    #[Computed]
+    public function hasCurrentYear(): bool
+    {
+        return count(array_filter($this->overtimeConfirmations, function ($item) {
+            return $item['year'] === now()->year && $item['month'] === now()->month;
+        })) > 0;
     }
 }
