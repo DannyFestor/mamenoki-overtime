@@ -11,7 +11,7 @@
             </div>
         </div>
         <div>
-            <a href="{{ route('overtime.index') }}" class="h-64 w-64 rounded-full border-8 border-emerald-300 bg-emerald-100 text-emerald-800 flex justify-center items-center text-center text-2xl transition-all hover:scale-105">
+            <a wire:navigate href="{{ route('overtime.index') }}" class="h-64 w-64 rounded-full border-8 border-emerald-300 bg-emerald-100 text-emerald-800 flex justify-center items-center text-center text-2xl transition-all hover:scale-105">
                 時間外勤務<br>
                 休日出勤<br>
                 申請
