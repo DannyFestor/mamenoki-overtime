@@ -6,6 +6,7 @@ use App\Livewire\Forms\Overtime\OvertimeConfirmationForm;
 use App\Models\OvertimeConfirmation;
 use App\Models\User;
 use Carbon\Carbon;
+use IntlDateFormatter;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -82,6 +83,11 @@ class Index extends Component
         if ($this->year < now()->year) {
             $this->year++;
         }
+
+        $date = Carbon::parse($this->year . '-' . $this->month);
+        if ($date->startOfMonth() > now()->startOfMonth()) {
+            $this->month = now()->month;
+        }
     }
 
     public function decreaseMonth(): void
@@ -102,17 +108,30 @@ class Index extends Component
         $this->month = $date->month;
     }
 
-    #[Computed]
-    public function previousMonth(): Carbon
-    {
-        return Carbon::parse($this->year . '-' . $this->month)->startOfMonth()->subMonth();
-    }
-
     public function queryString()
     {
         return [
             'year' => ['except' => now()->year],
             'month' => ['except' => now()->month],
         ];
+    }
+
+    #[Computed]
+    public function previousMonth(): Carbon
+    {
+        return Carbon::parse($this->year . '-' . $this->month)->startOfMonth()->subMonth();
+    }
+
+    #[Computed]
+    public function japaneseYear(): string
+    {
+        $formatter = new IntlDateFormatter('ja_JP@calendar=japanese', IntlDateFormatter::FULL,
+            IntlDateFormatter::NONE, 'Asia/Tokyo', IntlDateFormatter::TRADITIONAL);
+
+        $dateString = $formatter->format(Carbon::parse($this->year . '-' . $this->month));
+
+        $dateString = substr($dateString, 0, strpos($dateString, '年'));
+
+        return $dateString;
     }
 }

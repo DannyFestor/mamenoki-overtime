@@ -3,7 +3,7 @@
         <div>{{ $name }}</div>
         <div class="flex gap-2">
             <x-svgs.chevron-left wire:click="decreaseYear" class="cursor-pointer" />
-            {{ $year }}年度 時間外勤務命令簿
+            {{ $this->japaneseYear() }}年度 時間外勤務命令簿
             <x-svgs.chevron-right wire:click="increaseYear" class="cursor-pointer" />
         </div>
         <div class="flex gap-2">
