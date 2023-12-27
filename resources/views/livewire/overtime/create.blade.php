@@ -56,6 +56,8 @@
                  x-data="{
                 timeFrom: $wire.entangle('form.timeFrom').live,
                 timeUntil: $wire.entangle('form.timeUntil').live,
+                locked: $wire.entangle('locked').live,
+
                 init() {
                     let pickerFrom = flatpickr(this.$refs.time_from, {
                         altInput: true,
@@ -82,8 +84,25 @@
                         }
                     });
 
+                    if (this.locked) {
+                        pickerFrom._input.setAttribute('disabled', 'disabled');
+                        pickerUntil._input.setAttribute('disabled', 'disabled');
+                    } else {
+                        pickerFrom._input.removeAttribute('disabled');
+                        pickerUntil._input.removeAttribute('disabled');
+                    }
+
                     this.$watch('timeFrom', () => pickerFrom.setDate(this.timeFrom))
                     this.$watch('timeUntil', () => pickerUntil.setDate(this.timeUntil))
+                    this.$watch('locked', (v) => {
+                        if (v) {
+                            pickerFrom._input.setAttribute('disabled', 'disabled');
+                            pickerUntil._input.setAttribute('disabled', 'disabled');
+                        } else {
+                            pickerFrom._input.removeAttribute('disabled');
+                            pickerUntil._input.removeAttribute('disabled');
+                        }
+                    });
                 }
             }" class="flex-1 flex flex-col">
                 <label for="time_from">取得日を選んでください</label>
@@ -111,7 +130,7 @@
 
             <div class="flex-1 flex flex-col">
                 <label for="reason">事由を選んでください</label>
-                <select wire:model="form.reason" name="reason" class="form-select">
+                <select @if($locked) disabled @endif wire:model="form.reason" name="reason" class="form-select">
                     <option value="0">理由を選んでください</option>
                     @foreach(\App\Enums\OvertimeReason::toArray() as $value => $label)
                     <option value="{{ $value }}">{{ $label }}</option>
@@ -133,7 +152,7 @@
 
             <div class="flex-1 flex flex-col">
                 <label for="remarks">備考</label>
-                <textarea wire:model="form.remarks" name="remarks" id="remarks" cols="30" rows="3" class="form-textarea w-full"></textarea>
+                <textarea @if($locked) disabled @endif wire:model="form.remarks" name="remarks" id="remarks" cols="30" rows="3" class="form-textarea w-full"></textarea>
                 @error('form.remarks')
                 {{ $message }}
                 @enderror

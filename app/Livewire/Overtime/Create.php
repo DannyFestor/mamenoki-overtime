@@ -4,6 +4,8 @@ namespace App\Livewire\Overtime;
 
 use App\Livewire\Forms\OvertimeForm;
 use App\Models\Overtime;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Livewire\Component;
 
 class Create extends Component
@@ -14,9 +16,16 @@ class Create extends Component
 
     public OvertimeForm $form;
 
-    public function mount()
+    public function mount(Request $request)
     {
         $this->name = \Auth::user()->name;
+
+        try {
+            $date = Carbon::parse($request->get('date'));
+            $this->locked = $this->form->fromDate(\Auth::id(), $date->format('Y-m-d'));
+        } catch (\Throwable $e) {
+
+        }
     }
 
     public function render()
