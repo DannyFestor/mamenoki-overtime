@@ -10,21 +10,69 @@
     </div>
 
     <form wire:submit="submit" class="w-full max-w-lg mx-auto flex flex-col divide-y-2 divide-slate-200 gap-4 border-2 border-sky-900">
-        <div class="flex flex-col p-4">
+        <div wire:ignore
+            x-data="{
+            value: $wire.entangle('form.date').live,
+            init() {
+                let picker = flatpickr(this.$refs.pickr, {
+                    altInput: true,
+                    altFormat: 'Y年m月d日',
+                    dateFormat: 'Y-m-d',
+                    defaultDate: this.value,
+                    onChange: (date, dateString) => {
+                        this.value = dateString;
+                    }
+                });
+
+                this.$watch('value', () => picker.setDate(this.value))
+            }
+        }" class="flex flex-col p-4">
             <label for="date">時間外勤務をした日を選んでください</label>
-            <input wire:model.change="form.date" name="date" type="date" class="form-input">
+            <input x-ref="pickr" name="date" type="text" class="form-input">
             @error('form.date')
             {{ $message }}
             @enderror
-            TODO: better date picker
         </div>
 
-        <div class="flex flex-col p-4">
+        <div wire:ignore
+             x-data="{
+            timeFrom: $wire.entangle('form.timeFrom').live,
+            timeUntil: $wire.entangle('form.timeUntil').live,
+            init() {
+                let pickerFrom = flatpickr(this.$refs.time_from, {
+                    altInput: true,
+                    altFormat: 'H:i時',
+                    enableTime: true,
+                    noCalendar: true,
+                    dateFormat: 'H:i',
+                    time_24hr: true,
+                    defaultDate: this.timeFrom,
+                    onChange: (date, dateString) => {
+                        this.timeFrom = dateString;
+                    }
+                });
+                let pickerUntil = flatpickr(this.$refs.time_until, {
+                    altInput: true,
+                    altFormat: 'H:i時',
+                    enableTime: true,
+                    noCalendar: true,
+                    dateFormat: 'H:i',
+                    time_24hr: true,
+                    defaultDate: this.timeUntil,
+                    onChange: (date, dateString) => {
+                        this.timeUntil = dateString;
+                    }
+                });
+
+                this.$watch('timeFrom', () => pickerFrom.setDate(this.timeFrom))
+                this.$watch('timeUntil', () => pickerUntil.setDate(this.timeUntil))
+            }
+        }" class="flex flex-col p-4">
             <label for="time_from">取得日を選んでください</label>
             <div class="flex w-full">
-                <input wire:model.live="form.timeFrom" name="time_from" type="text" class="form-input w-[45%]">
+                <input x-ref="time_from" name="time_from" type="text" class="form-input w-[45%]">
                 <div class="flex items-center justify-center w-[10%]">〜</div>
-                <input wire:model.="form.timeUntil" name="time_until" type="text" class="form-input w-[45%]">
+                <input x-ref="time_until" name="time_until" type="text" class="form-input w-[45%]">
             </div>
             @error('form.timeFrom')
             {{ $message }}
