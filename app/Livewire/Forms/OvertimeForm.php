@@ -6,10 +6,10 @@ use App\Enums\OvertimeReason;
 use App\Models\Overtime;
 use App\Models\OvertimeConfirmation;
 use Carbon\Carbon;
-use Carbon\CarbonImmutable;
 use Illuminate\Validation\Rule;
-use Livewire\Attributes\Validate;
 use Livewire\Form;
+use Filament\Notifications\Notification;
+use Filament\Notifications\Actions\Action;
 
 class OvertimeForm extends Form
 {
@@ -47,6 +47,28 @@ class OvertimeForm extends Form
                 'remarks' => $previousMonthOvertimeConfirmation?->transfer_remarks,
             ]);
 
+        $overtime = Overtime::query()
+            ->where('overtime_confirmation_id', '=', $overtimeConfirmation->id)
+            ->where('date', '=', $this->date)
+            ->first();
+        if ($overtime !== null && $overtime->approved_at !== null) {
+            Notification::make()
+                ->title( 'エラー')
+                ->danger()
+                ->color('danger')
+                ->body('選択された日付に既に承認済みの残業が存在しています。')
+                ->actions([
+                    Action::make('view')
+                        ->label('残業一覧へ戻る')
+                        ->button()
+                        ->url(route('overtime.index'), shouldOpenInNewTab: false),
+                ])
+                ->duration(10000)
+                ->send();
+
+            return;
+        }
+
         $overtime = Overtime::updateOrCreate([
             'overtime_confirmation_id' => $overtimeConfirmation->id,
             'date' => $this->date,
@@ -59,6 +81,33 @@ class OvertimeForm extends Form
             'applicant_user_id' => $userId, // TODO: get id for applicant, not logged in user
             'applied_at' => $isApplied ? now() : null,
         ]);
+
+        $notification = $dateObject->format('Y年m月d日') . 'の残業を';
+        if ($isApplied) {
+            $notification .= '申請';
+        } else {
+            $notification .= '一時保存';
+        }
+        $notification .= 'しました。';
+
+        $createdString = '更新';
+        if ($overtime->wasRecentlyCreated) {
+            $createdString = '新規作成';
+        }
+
+        Notification::make()
+            ->title( $createdString.'しました。')
+            ->success()
+            ->color('success')
+            ->body($notification)
+            ->actions([
+                Action::make('view')
+                    ->label('残業一覧へ戻る')
+                    ->button()
+                    ->url(route('overtime.index'), shouldOpenInNewTab: false),
+            ])
+            ->duration(10000)
+            ->send();
     }
 
     public function rules()
