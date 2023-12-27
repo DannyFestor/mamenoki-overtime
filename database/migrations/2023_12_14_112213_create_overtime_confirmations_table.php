@@ -9,6 +9,7 @@ return new class extends Migration {
     {
         Schema::create('overtime_confirmations', function (Blueprint $table) {
             $table->id();
+            $table->uuid();
             $table->unsignedBigInteger('user_id');
             $table->unsignedSmallInteger('year');
             $table->unsignedTinyInteger('month');
@@ -17,6 +18,8 @@ return new class extends Migration {
             $table->dateTime('confirmed_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index(['uuid']);
         });
     }
 

@@ -16,6 +16,16 @@ enum OvertimeReason: int
     case HOLIDAY_OFFICE_WORK = 10;
     case HOLIDAY_ELSE = 11;
 
+    public static function toArray(): array
+    {
+        $cases = [];
+        foreach(self::cases() as $case) {
+            $cases[$case->value] = $case->toString();
+        }
+
+        return $cases;
+    }
+
     public function toString(): string
     {
         return match($this) {

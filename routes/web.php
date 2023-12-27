@@ -22,7 +22,7 @@ Route::get('/dashboard', \App\Livewire\Dashboard::class)->middleware(['auth', 'v
 
 Route::group(['as' => 'overtime.', 'prefix' => 'overtime', 'middleware' => ['auth', 'verified']], function () {
     Route::get('/', \App\Livewire\Overtime\Index::class)->name('index');
-    Route::get('/create', function () {})->name('create');
+    Route::get('/create', \App\Livewire\Overtime\Create::class)->name('create');
     Route::get('/{overtime_confirmation}', function () {})->name('show');
 });
 

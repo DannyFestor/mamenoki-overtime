@@ -11,6 +11,7 @@ class OvertimeConfirmation extends Model
     use SoftDeletes, HasFactory;
 
     protected $fillable = [
+        'uuid',
         'user_id',
         'year',
         'month',
@@ -22,4 +23,18 @@ class OvertimeConfirmation extends Model
     protected $casts = [
         'confirmed_at' => 'datetime',
     ];
+
+    public static function booting(): void
+    {
+        parent::booting();
+
+        static::creating(function (OvertimeConfirmation $overtimeConfirmation) {
+            $overtimeConfirmation->uuid = \Str::uuid();
+        });
+    }
+
+    public function getRouteKey()
+    {
+        return 'uuid';
+    }
 }

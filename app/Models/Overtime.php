@@ -12,13 +12,11 @@ class Overtime extends Model
     use SoftDeletes, HasFactory;
 
     protected $fillable = [
-        'user_id',
+        'uuid',
         'overtime_confirmation_id',
         'date',
-        'from_hours',
-        'from_minutes',
-        'to_hours',
-        'to_minutes',
+        'time_from',
+        'time_until',
         'reason',
         'remarks',
         'created_user_id',
@@ -34,4 +32,13 @@ class Overtime extends Model
         'approved_at' => 'datetime',
         'reason' => OvertimeReason::class,
     ];
+
+    public static function booting(): void
+    {
+        parent::booting();
+
+        static::creating(function (Overtime $overtime) {
+            $overtime->uuid = \Str::uuid();
+        });
+    }
 }
