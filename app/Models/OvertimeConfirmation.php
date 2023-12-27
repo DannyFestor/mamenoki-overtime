@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OvertimeConfirmation extends Model
@@ -36,5 +37,10 @@ class OvertimeConfirmation extends Model
     public function getRouteKey()
     {
         return 'uuid';
+    }
+
+    public function overtimes(): HasMany
+    {
+        return $this->hasMany(Overtime::class, 'overtime_confirmation_id');
     }
 }

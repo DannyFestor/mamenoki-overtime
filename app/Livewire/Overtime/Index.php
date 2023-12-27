@@ -3,6 +3,7 @@
 namespace App\Livewire\Overtime;
 
 use App\Livewire\Forms\Overtime\OvertimeConfirmationForm;
+use App\Models\Overtime;
 use App\Models\OvertimeConfirmation;
 use App\Models\User;
 use Carbon\Carbon;
@@ -61,6 +62,7 @@ class Index extends Component
 
     public function render()
     {
+        // TODO: ADMIN CAN SELECT DIFFERENT USERS
         $user = \Auth::user();
 
         $previousMonthOvertimeConfirmation = OvertimeConfirmation::where([
@@ -69,17 +71,34 @@ class Index extends Component
             'month' => $this->previousMonth()->month,
         ])->first();
 
-        $overtimeConfirmation = OvertimeConfirmation::firstOrNew([
-            'user_id' => $user->id,
-            'year' => $this->year,
-            'month' => $this->month,
-        ], [
-            'remarks' => $previousMonthOvertimeConfirmation?->transfer_remarks,
-        ]);
+        $overtimeConfirmation = OvertimeConfirmation::query()
+            ->firstOrNew([
+                'user_id' => $user->id,
+                'year' => $this->year,
+                'month' => $this->month,
+            ], [
+                'remarks' => $previousMonthOvertimeConfirmation?->transfer_remarks,
+            ]);
+
+        $overtimes = collect();
+        if ($overtimeConfirmation !== null) {
+            $overtimes = Overtime::query()
+                ->with(['creator', 'applicant', 'approver'])
+                ->where('overtime_confirmation_id', '=', $overtimeConfirmation->id)
+                ->orderBy('date', 'DESC')
+                ->get()
+                ->groupBy(function (Overtime $overtime): string {
+                    if ($overtime->approved_at !== null) return 'approved';
+                    if ($overtime->applied_at !== null) return 'applied';
+                    return 'saved';
+                });
+        }
 
         $this->form->setForm($overtimeConfirmation);
 
-        return view('livewire.overtime.index');
+        return view('livewire.overtime.index', [
+            'overtimes' => $overtimes,
+        ]);
     }
 
     public function decreaseYear(): void
@@ -150,7 +169,7 @@ class Index extends Component
     public function hasCurrentYear(): bool
     {
         return count(array_filter($this->overtimeConfirmations, function ($item) {
-            return $item['year'] === now()->year && $item['month'] === now()->month;
-        })) > 0;
+                return $item['year'] === now()->year && $item['month'] === now()->month;
+            })) > 0;
     }
 }
