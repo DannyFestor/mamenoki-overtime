@@ -20,7 +20,7 @@
 
             <div wire:ignore
                 x-data="{
-                value: $wire.entangle('form.date').live,
+                value: $wire.entangle('date').live,
                 init() {
                     let picker = flatpickr(this.$refs.pickr, {
                         altInput: true,
@@ -43,6 +43,12 @@
             </div>
         </div>
 
+        @if($isConfirmed)
+            <div class="text-red-500 font-bold p-4 text-center">
+                選択された年月は既に最終確認を行いましたので、新規作成することはできません。
+            </div>
+        @endif
+
         {{-- Time --}}
         <div class="flex p-4 gap-4">
             <div class="sm:mt-5">
@@ -55,7 +61,8 @@
                  x-data="{
                 timeFrom: $wire.entangle('form.timeFrom').live,
                 timeUntil: $wire.entangle('form.timeUntil').live,
-                locked: $wire.entangle('locked').live,
+                isApproved: $wire.entangle('isApproved').live,
+                isConfirmed: $wire.entangle('isConfirmed').live,
 
                 init() {
                     let pickerFrom = flatpickr(this.$refs.time_from, {
@@ -83,7 +90,7 @@
                         }
                     });
 
-                    if (this.locked) {
+                    if (this.isApproved || this.isConfirmed) {
                         pickerFrom._input.setAttribute('disabled', 'disabled');
                         pickerUntil._input.setAttribute('disabled', 'disabled');
                     } else {
@@ -93,7 +100,16 @@
 
                     this.$watch('timeFrom', () => pickerFrom.setDate(this.timeFrom))
                     this.$watch('timeUntil', () => pickerUntil.setDate(this.timeUntil))
-                    this.$watch('locked', (v) => {
+                    this.$watch('isApproved', (v) => {
+                        if (v) {
+                            pickerFrom._input.setAttribute('disabled', 'disabled');
+                            pickerUntil._input.setAttribute('disabled', 'disabled');
+                        } else {
+                            pickerFrom._input.removeAttribute('disabled');
+                            pickerUntil._input.removeAttribute('disabled');
+                        }
+                    });
+                    this.$watch('isConfirmed', (v) => {
                         if (v) {
                             pickerFrom._input.setAttribute('disabled', 'disabled');
                             pickerUntil._input.setAttribute('disabled', 'disabled');
@@ -129,7 +145,7 @@
 
             <div class="flex-1 flex flex-col">
                 <label for="reason">事由を選んでください</label>
-                <select @if($locked) disabled @endif wire:model="form.reason" name="reason" class="form-select w-full">
+                <select @if($isApproved || $isConfirmed) disabled @endif wire:model="form.reason" name="reason" class="form-select w-full">
                     <option value="0">理由を選んでください</option>
                     @foreach(\App\Enums\OvertimeReason::toArray() as $value => $label)
                     <option value="{{ $value }}">{{ $label }}</option>
@@ -151,7 +167,7 @@
 
             <div class="flex-1 flex flex-col">
                 <label for="remarks">備考</label>
-                <textarea @if($locked) disabled @endif wire:model="form.remarks" name="remarks" id="remarks" cols="30" rows="3" class="form-textarea w-full"></textarea>
+                <textarea @if($isApproved || $isConfirmed) disabled @endif wire:model="form.remarks" name="remarks" id="remarks" cols="30" rows="3" class="form-textarea w-full"></textarea>
                 @error('form.remarks')
                 {{ $message }}
                 @enderror
@@ -159,7 +175,7 @@
         </div>
 
         <div>
-            @if($locked)
+            @if($isApproved)
             <div class="text-center text-red-500">
                 選択された日付には既に承認済みの残業があります。
             </div>
@@ -168,9 +184,9 @@
                 <button type="submit"
                         @class([
                             'w-20 h-20 rounded-full border-4 border-emerald-300 bg-emerald-100 text-emerald-800 flex flex-col justify-center items-center transition-all hover:scale-105 hover:shadow',
-                            'opacity-50' => $locked
+                            'opacity-50' => ($isApproved || $isConfirmed)
                         ])
-                        @if($locked)
+                        @if($isApproved || $isConfirmed)
                             disabled
                         @endif
                 >
@@ -182,9 +198,9 @@
                 <button wire:click="saveDraft" type="button"
                         @class([
                             'w-20 h-20 rounded-full border-4 border-amber-300 bg-amber-100 text-amber-800 flex flex-col justify-center items-center transition-all hover:scale-105 hover:shadow',
-                            'opacity-50' => $locked
+                            'opacity-50' => ($isApproved || $isConfirmed)
                         ])
-                        @if($locked)
+                        @if($isApproved || $isConfirmed)
                             disabled
                         @endif
                 >

@@ -4,27 +4,36 @@ namespace App\Livewire\Overtime;
 
 use App\Livewire\Forms\OvertimeForm;
 use App\Models\Overtime;
+use App\Models\OvertimeConfirmation;
 use Carbon\Carbon;
+use Filament\Notifications\Actions\Action;
+use Filament\Notifications\Notification;
 use Illuminate\Http\Request;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 class Create extends Component
 {
     public string $name = '';
 
-    public bool $locked = false;
+    public bool $isApproved = false;
+
+    public bool $isConfirmed = false;
 
     public OvertimeForm $form;
+
+    public $date = '';
 
     public function mount(Request $request)
     {
         $this->name = \Auth::user()->name;
 
         try {
-            $date = Carbon::parse($request->get('date'));
-            $this->locked = $this->form->fromDate(\Auth::id(), $date->format('Y-m-d'));
+            $this->date = Carbon::parse($this->date)->format('Y-m-d');
         } catch (\Throwable $e) {
-
+            $this->date = now()->format('Y-m-d');
+        } finally {
+            $this->formFromDate();
         }
     }
 
@@ -33,28 +42,68 @@ class Create extends Component
         return view('livewire.overtime.create');
     }
 
+    public function updatedDate($value)
+    {
+        try {
+            $this->date = Carbon::parse($value)->format('Y-m-d');
+        } catch (\Throwable $e) {
+            $this->date = now()->format('Y-m-d');
+        } finally {
+            $this->formFromDate();
+        }
+    }
+
     public function submit()
     {
+        if ($this->isConfirmed || $this->isApproved) {
+            return;
+        }
+
         // TODO: get id in a smarter way, because admin can change ID for user (applicant_user_id)
         $this->form->save(\Auth::id());
     }
 
     public function saveDraft()
     {
+        if ($this->isConfirmed || $this->isApproved) {
+            return;
+        }
+
         // TODO: get id in a smarter way, because admin can change ID for user (applicant_user_id)
         $this->form->save(\Auth::id(), isApplied: false);
     }
 
-    public function updated($property, $value)
+    private function formFromDate(): void
     {
-        if ($property === 'form.date') {
-            // TODO: get id in a smarter way, because admin can change ID for user (applicant_user_id)
-            $this->formFromDate($value);
-        }
+        $this->form->fromDate(\Auth::id(), $this->date);
+        $this->checkShouldLock($this->date);
     }
 
-    private function formFromDate($date)
+    /**
+     * @param Carbon $dateObject
+     * @return void
+     */
+    public function checkShouldLock(string $date): void
     {
-        $this->locked = $this->form->fromDate(\Auth::id(), $date);
+        $this->isApproved = $this->form
+            ->fromDate(\Auth::id(), $date);
+
+        [$year, $month, $day] = explode('-', $date);
+
+        $this->isConfirmed = OvertimeConfirmation::query()
+            ->where('user_id', '=', \Auth::id())
+            ->where('year', '=', $year)
+            ->where('month', '=', $month)
+            ->whereNotNull('confirmed_at')
+            ->exists();
+    }
+
+    protected function queryString()
+    {
+        return [
+            'date' => [
+                'except' => now()->format('Y-m-d'),
+            ],
+        ];
     }
 }

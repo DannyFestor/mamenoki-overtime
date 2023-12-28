@@ -79,7 +79,7 @@
           id="form"
           class="w-full flex flex-col sm:flex-row justify-between border-2 border-sky-900">
 
-        <div class="p-4 w-full sm:w-1/2 flex flex-col justify-center items-center">
+        <div class="order-2 sm:order-1 p-4 w-full sm:w-1/2 flex flex-col justify-center items-center">
             <div wire:loading>
                 <svg class="animate-spin -ml-1 mr-3 h-16 w-16 text-slate-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -110,7 +110,7 @@
             </div>
         </div>
 
-        <div class="flex flex-col gap-2 p-4 w-full sm:w-1/2">
+        <div class="order-1 sm:order-2 flex flex-col gap-2 p-4 w-full sm:w-1/2">
             <div class="flex flex-col">
                 <label for="form_remarks">
                     備考欄（当月分）

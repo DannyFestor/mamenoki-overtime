@@ -29,6 +29,7 @@ class OvertimeForm extends Form
         $this->validate();
 
         $dateObject = Carbon::parse($this->date);
+
         $overtimeConfirmation = $this->getOvertimeConfirmationForUserAndDate($userId, $dateObject);
 
         $overtime = Overtime::query()
@@ -91,6 +92,7 @@ class OvertimeForm extends Form
                 'user_id' => $userId, // TODO: get id for applicant, not logged in user
                 'year' => $dateObject->year,
                 'month' => $dateObject->month,
+            ], [
                 'remarks' => $previousMonthOvertimeConfirmation?->transfer_remarks,
             ]);
         return $overtimeConfirmation;
@@ -163,6 +165,7 @@ class OvertimeForm extends Form
             ->first();
 
         if ($overtime === null) {
+            $this->date = $date;
             $this->reset(['timeFrom', 'timeUntil', 'reason', 'remarks']);
             return false;
         }
