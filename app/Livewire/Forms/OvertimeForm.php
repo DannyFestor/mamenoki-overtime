@@ -50,7 +50,7 @@ class OvertimeForm extends Form
             'reason' => $this->reason,
             'remarks' => $this->remarks,
             'created_user_id' => $userId,
-            'applicant_user_id' => $userId, // TODO: get id for applicant, not logged in user
+            'applicant_user_id' => $isApplied ? $userId : null, // TODO: get id for applicant, not logged in user
             'applied_at' => $isApplied ? now() : null,
         ]);
 
@@ -155,9 +155,11 @@ class OvertimeForm extends Form
     public function fromDate(int $userId, string $date): bool
     {
         $overtime = Overtime::query()
+            ->select(['overtimes.*', 'overtime_confirmations.user_id'])
+            ->leftJoin('overtime_confirmations', 'overtime_confirmations.id', '=', 'overtimes.overtime_confirmation_id')
             ->where('date', '=', $date)
             // TODO: get id in a smarter way, because admin can change ID for user (applicant_user_id)
-            ->where('applicant_user_id', '=', $userId)
+            ->where('user_id', '=', $userId)
             ->first();
 
         if ($overtime === null) {

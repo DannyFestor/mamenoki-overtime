@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Overtime;
 
-use App\Livewire\Forms\Overtime\OvertimeConfirmationForm;
+use App\Livewire\Forms\OvertimeConfirmationForm;
 use App\Models\Overtime;
 use App\Models\OvertimeConfirmation;
 use App\Models\User;
@@ -16,15 +16,15 @@ class Index extends Component
 {
     public string $name = '';
 
-    public OvertimeConfirmationForm $form;
-
     #[Url]
     public int $year;
 
     #[Url]
     public int $month;
 
-    public array $overtimeConfirmations = [];
+    public array $overtimeConfirmationsPerYear = [];
+
+    public OvertimeConfirmationForm $form;
 
     public function mount()
     {
@@ -52,11 +52,13 @@ class Index extends Component
 
         $this->name = \Auth::user()->name;
 
-        $this->overtimeConfirmations = OvertimeConfirmation::query()
+        $this->overtimeConfirmationsPerYear = OvertimeConfirmation::query()
+            ->select(['year', 'month'])
             ->where(['user_id' => \Auth::user()->id])
             ->orderBy('year', 'desc')
             ->orderBy('month', 'desc')
             ->get()
+            ->groupBy('year')
             ->toArray();
     }
 
@@ -92,13 +94,20 @@ class Index extends Component
                     if ($overtime->applied_at !== null) return 'applied';
                     return 'saved';
                 });
+
         }
 
         $this->form->setForm($overtimeConfirmation);
 
         return view('livewire.overtime.index', [
             'overtimes' => $overtimes,
+            'user' => \Auth::user(),
         ]);
+    }
+
+    public function submit()
+    {
+        $this->form->save(\Auth::id(), $this->year, $this->month);
     }
 
     public function decreaseYear(): void
@@ -168,7 +177,7 @@ class Index extends Component
     #[Computed]
     public function hasCurrentYear(): bool
     {
-        return count(array_filter($this->overtimeConfirmations, function ($item) {
+        return count(array_filter($this->overtimeConfirmationsPerYear, function ($item) {
                 return $item['year'] === now()->year && $item['month'] === now()->month;
             })) > 0;
     }
