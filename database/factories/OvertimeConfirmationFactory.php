@@ -14,9 +14,7 @@ class OvertimeConfirmationFactory extends Factory
     {
         return [
             'user_id' => $this->faker->randomNumber(),
-            'year' => $this->faker->randomNumber(),
-            'month' => $this->faker->randomNumber(),
-            'confirmed_at' => Carbon::now(),
+            'confirmed_at' => $this->faker->boolean ? Carbon::now() : null,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ];

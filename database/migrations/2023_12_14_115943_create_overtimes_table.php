@@ -15,7 +15,7 @@ return new class extends Migration
             $table->date('date');
             $table->time('time_from');
             $table->time('time_until');
-            $table->text('reason');
+            $table->unsignedSmallInteger('reason');
             $table->text('remarks')->nullable();
             $table->foreignId('created_user_id')->references('id')->on('users');
             $table->foreignId('applicant_user_id')->nullable()->references('id')->on('users');

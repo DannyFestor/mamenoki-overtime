@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Str;
 
 class Overtime extends Model
 {
@@ -42,7 +43,7 @@ class Overtime extends Model
         parent::booting();
 
         static::creating(function(Overtime $overtime) {
-            $overtime->uuid = \Str::uuid();
+            $overtime->uuid = Str::uuid();
         });
     }
 
@@ -88,6 +89,11 @@ class Overtime extends Model
                 ->sortable()
                 ->toggleable(isToggledHiddenByDefault: true),
         ];
+    }
+
+    public function overtimeConfirmation(): BelongsTo
+    {
+        return $this->belongsTo(OvertimeConfirmation::class);
     }
 
     public function timeDifference(): Attribute
