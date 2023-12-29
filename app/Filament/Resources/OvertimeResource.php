@@ -11,7 +11,10 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Livewire\Component;
+use Livewire\Livewire;
 
 class OvertimeResource extends Resource
 {
@@ -62,46 +65,7 @@ class OvertimeResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('overtime_confirmation_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_user_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('applicant_user_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('approval_user_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('uuid')
-                    ->label('UUID')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('date')
-                    ->date()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('time_from'),
-                Tables\Columns\TextColumn::make('time_until'),
-                Tables\Columns\TextColumn::make('applied_at')
-                    ->dateTime()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('approved_at')
-                    ->dateTime()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
+            ->columns(Overtime::filamentTable())
             ->filters([
                 //
             ])
@@ -111,6 +75,17 @@ class OvertimeResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('approve')
+                        ->label('選択中を承認する')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->visible(fn (Component $livewire) => $livewire->activeTab === 'applied')
+                        ->action(fn (Collection $records) => $records->each(fn (Overtime $overtime) => $overtime->update([
+                            'approved_at' => now(),
+                            'approval_user_id' => \Auth::id(),
+                        ])))
+                        ->deselectRecordsAfterCompletion()
                 ]),
             ]);
     }

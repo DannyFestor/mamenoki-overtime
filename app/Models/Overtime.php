@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Filament\Tables;
 
 class Overtime extends Model
 {
@@ -45,6 +46,50 @@ class Overtime extends Model
         });
     }
 
+    public static function filamentTable(): array
+    {
+        return [
+            Tables\Columns\TextColumn::make('overtime_confirmation_id')
+                ->numeric()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('created_user_id')
+                ->numeric()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('applicant_user_id')
+                ->numeric()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('approval_user_id')
+                ->numeric()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('uuid')
+                ->label('UUID')
+                ->searchable(),
+            Tables\Columns\TextColumn::make('date')
+                ->date()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('time_from'),
+            Tables\Columns\TextColumn::make('time_until'),
+            Tables\Columns\TextColumn::make('applied_at')
+                ->dateTime()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('approved_at')
+                ->dateTime()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('created_at')
+                ->dateTime()
+                ->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
+            Tables\Columns\TextColumn::make('updated_at')
+                ->dateTime()
+                ->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
+            Tables\Columns\TextColumn::make('deleted_at')
+                ->dateTime()
+                ->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
+        ];
+    }
+
     public function timeDifference(): Attribute
     {
         return Attribute::make(
@@ -54,8 +99,12 @@ class Overtime extends Model
 
                 $diff = $timeUntil->diff($timeFrom);
                 $format = '';
-                if ($diff->h !== 0) $format .= '%h時間';
-                if ($diff->i !== 0) $format .= '%i分';
+                if ($diff->h !== 0) {
+                    $format .= '%h時間';
+                }
+                if ($diff->i !== 0) {
+                    $format .= '%i分';
+                }
 
                 return $timeUntil->diff($timeFrom)->format($format);
             }
