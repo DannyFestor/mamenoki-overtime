@@ -7,17 +7,21 @@ use App\Models\Overtime;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListOvertimes extends ListRecords
 {
     protected static string $resource = OvertimeResource::class;
 
-    protected function getHeaderActions(): array
+    public function table(Table $table): Table
     {
-        return [
-            Actions\CreateAction::make(),
-        ];
+        return parent::table($table)
+            ->modifyQueryUsing(fn(Builder $query) => $query
+                ->select(['overtimes.*', 'overtime_confirmations.year', 'overtime_confirmations.month', 'overtime_confirmations.user_id', 'users.name'])
+                ->leftJoin('overtime_confirmations', 'overtime_confirmations.id', '=', 'overtimes.overtime_confirmation_id')
+                ->leftJoin('users', 'users.id', '=', 'overtime_confirmations.user_id')
+            );
     }
 
     public function getTabs(): array
@@ -47,6 +51,13 @@ class ListOvertimes extends ListRecords
                     ->whereNotNull('applied_at')
                     ->whereNotNull('approved_at')
                 ),
+        ];
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\CreateAction::make(),
         ];
     }
 }

@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('overtime_confirmations', function(Blueprint $table) {
             $table->id();
             $table->uuid();
-            $table->unsignedBigInteger('user_id');
+            $table->foreignId('user_id')->references('id')->on('users');
             $table->unsignedSmallInteger('year');
             $table->unsignedTinyInteger('month');
             $table->text('remarks')->nullable();

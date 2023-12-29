@@ -44,28 +44,17 @@ class OvertimeForm extends Form
         $overtime = Overtime::updateOrCreate([
             'overtime_confirmation_id' => $overtimeConfirmation->id,
             'date' => $this->date,
+            'applicant_user_id' => $userId,
         ], [
             'time_from' => $this->timeFrom,
             'time_until' => $this->timeUntil,
             'reason' => $this->reason,
             'remarks' => $this->remarks,
             'created_user_id' => $userId,
-            'applicant_user_id' => $isApplied ? $userId : null, // TODO: get id for applicant, not logged in user
             'applied_at' => $isApplied ? now() : null,
         ]);
 
         $this->sendSuccessNotification($dateObject, $isApplied, $overtime->wasRecentlyCreated);
-    }
-
-    public function rules()
-    {
-        return [
-            'date' => ['required', 'date', 'date_format:Y-m-d', 'before_or_equal:today'],
-            'timeFrom' => ['required', 'date_format:H:i'],
-            'timeUntil' => ['required', 'date_format:H:i', 'after:timeFrom'],
-            'reason' => ['required', Rule::in(array_keys(OvertimeReason::toArray()))],
-            'remarks' => ['nullable', 'min:3'],
-        ];
     }
 
     private function getOvertimeConfirmationForUserAndDate(int $userId, Carbon $dateObject): OvertimeConfirmation
@@ -138,6 +127,17 @@ class OvertimeForm extends Form
             ])
             ->duration(10000)
             ->send();
+    }
+
+    public function rules()
+    {
+        return [
+            'date' => ['required', 'date', 'date_format:Y-m-d', 'before_or_equal:today'],
+            'timeFrom' => ['required', 'date_format:H:i'],
+            'timeUntil' => ['required', 'date_format:H:i', 'after:timeFrom'],
+            'reason' => ['required', Rule::in(array_keys(OvertimeReason::toArray()))],
+            'remarks' => ['nullable', 'min:3'],
+        ];
     }
 
     public function fromDate(int $userId, string $date): bool

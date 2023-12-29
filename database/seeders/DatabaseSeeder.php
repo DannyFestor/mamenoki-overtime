@@ -61,7 +61,7 @@ class DatabaseSeeder extends Seeder
                         'created_at' => $overtimeDate,
                         'created_user_id' => $users->random()->id,
                         'applied_at' => $isApplied ? $appliedDate : null,
-                        'applicant_user_id' => $isApplied ? $user->id : null,
+                        'applicant_user_id' => $user->id,
                         'approved_at' => $isApproved ? $approvedDate : null,
                         'approval_user_id' => $isApproved ? 1 : null,
                     ]);
