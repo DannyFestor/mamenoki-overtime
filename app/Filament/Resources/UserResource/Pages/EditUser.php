@@ -18,7 +18,7 @@ class EditUser extends EditRecord
         return [
             Actions\Action::make('新しいパスワードの発行')
                 ->requiresConfirmation()
-                ->action(function (User $record) {
+                ->action(function(User $record) {
                     $password = \Str::random();
 
                     $record->update([

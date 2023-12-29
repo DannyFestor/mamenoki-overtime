@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Filament\Tables;
 
 class OvertimeConfirmation extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'uuid',
@@ -32,7 +32,7 @@ class OvertimeConfirmation extends Model
     {
         parent::booting();
 
-        static::creating(function (OvertimeConfirmation $overtimeConfirmation) {
+        static::creating(function(OvertimeConfirmation $overtimeConfirmation) {
             $overtimeConfirmation->uuid = \Str::uuid();
         });
     }
@@ -66,7 +66,7 @@ class OvertimeConfirmation extends Model
             Tables\Columns\TextColumn::make('year')
                 ->label('年')
                 ->suffix('年')
-                ->sortable(query: function (Builder $query, string $direction): Builder {
+                ->sortable(query: function(Builder $query, string $direction): Builder {
                     return $query
                         ->orderBy('year', $direction)
                         ->orderBy('month', $direction);
@@ -77,16 +77,18 @@ class OvertimeConfirmation extends Model
                 ->numeric(),
             Tables\Columns\IconColumn::make('confirmed_at')
                 ->label('最終確認済み')
-                ->icon(function (string $state): string {
+                ->icon(function(string $state): string {
                     if ($state === '') {
                         return 'heroicon-o-x-mark';
                     }
+
                     return 'heroicon-o-check-badge';
                 })
-                ->color(function (string $state): string {
+                ->color(function(string $state): string {
                     if ($state === '') {
                         return 'danger';
                     }
+
                     return 'success';
                 })
                 ->default('')

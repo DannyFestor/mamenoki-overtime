@@ -5,7 +5,6 @@ namespace App\Livewire\Overtime;
 use App\Livewire\Forms\OvertimeConfirmationForm;
 use App\Models\Overtime;
 use App\Models\OvertimeConfirmation;
-use App\Models\User;
 use Carbon\Carbon;
 use IntlDateFormatter;
 use Livewire\Attributes\Computed;
@@ -89,9 +88,14 @@ class Index extends Component
                 ->where('overtime_confirmation_id', '=', $overtimeConfirmation->id)
                 ->orderBy('date', 'DESC')
                 ->get()
-                ->groupBy(function (Overtime $overtime): string {
-                    if ($overtime->approved_at !== null) return 'approved';
-                    if ($overtime->applied_at !== null) return 'applied';
+                ->groupBy(function(Overtime $overtime): string {
+                    if ($overtime->approved_at !== null) {
+                        return 'approved';
+                    }
+                    if ($overtime->applied_at !== null) {
+                        return 'applied';
+                    }
+
                     return 'saved';
                 });
 
@@ -177,8 +181,8 @@ class Index extends Component
     #[Computed]
     public function hasCurrentYear(): bool
     {
-        return count(array_filter($this->overtimeConfirmationsPerYear, function ($item) {
-                return $item['year'] === now()->year && $item['month'] === now()->month;
-            })) > 0;
+        return count(array_filter($this->overtimeConfirmationsPerYear, function($item) {
+            return $item['year'] === now()->year && $item['month'] === now()->month;
+        })) > 0;
     }
 }

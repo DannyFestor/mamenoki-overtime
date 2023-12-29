@@ -3,13 +3,9 @@
 namespace App\Livewire\Overtime;
 
 use App\Livewire\Forms\OvertimeForm;
-use App\Models\Overtime;
 use App\Models\OvertimeConfirmation;
 use Carbon\Carbon;
-use Filament\Notifications\Actions\Action;
-use Filament\Notifications\Notification;
 use Illuminate\Http\Request;
-use Livewire\Attributes\Url;
 use Livewire\Component;
 
 class Create extends Component
@@ -80,8 +76,7 @@ class Create extends Component
     }
 
     /**
-     * @param Carbon $dateObject
-     * @return void
+     * @param  Carbon  $dateObject
      */
     public function checkShouldLock(string $date): void
     {

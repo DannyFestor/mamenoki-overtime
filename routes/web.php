@@ -14,16 +14,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
+Route::get('/', function() {
     return view('welcome');
 });
 
 Route::get('/dashboard', \App\Livewire\Dashboard::class)->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::group(['as' => 'overtime.', 'prefix' => 'overtime', 'middleware' => ['auth', 'verified']], function () {
+Route::group(['as' => 'overtime.', 'prefix' => 'overtime', 'middleware' => ['auth', 'verified']], function() {
     Route::get('/', \App\Livewire\Overtime\Index::class)->name('index');
     Route::get('/create', \App\Livewire\Overtime\Create::class)->name('create');
-    Route::get('/{overtime_confirmation}', function () {})->name('show');
+    Route::get('/{overtime_confirmation}', function() {
+    })->name('show');
 });
 
 //Route::middleware('auth')->group(function () {
@@ -32,4 +33,4 @@ Route::group(['as' => 'overtime.', 'prefix' => 'overtime', 'middleware' => ['aut
 //    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 //});
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

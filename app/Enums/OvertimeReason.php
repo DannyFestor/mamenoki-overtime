@@ -19,7 +19,7 @@ enum OvertimeReason: int
     public static function toArray(): array
     {
         $cases = [];
-        foreach(self::cases() as $case) {
+        foreach (self::cases() as $case) {
             $cases[$case->value] = $case->toString();
         }
 
@@ -28,7 +28,7 @@ enum OvertimeReason: int
 
     public function toString(): string
     {
-        return match($this) {
+        return match ($this) {
             self::EXTENDED_CARE => '時間外勤務（延長保育のため）',
             self::TRAINING => '時間外勤務（研修参加のため）',
             self::MEETING => '時間外勤務（会議等参加のため）',

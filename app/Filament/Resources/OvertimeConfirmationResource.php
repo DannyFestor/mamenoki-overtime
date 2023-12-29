@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\OvertimeConfirmationResource\Pages;
-use App\Filament\Resources\OvertimeConfirmationResource\RelationManagers;
 use App\Models\OvertimeConfirmation;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -11,7 +10,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class OvertimeConfirmationResource extends Resource
 {
@@ -20,7 +18,9 @@ class OvertimeConfirmationResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
 
     protected static ?string $navigationGroup = '残業申請系';
+
     protected static ?int $navigationSort = 2;
+
     protected static ?string $navigationLabel = '最終確認管理';
 
     public static function form(Form $form): Form
@@ -64,26 +64,26 @@ class OvertimeConfirmationResource extends Resource
                     ->trueLabel('最終確認済みのみ')
                     ->falseLabel('最終確認済み以外')
                     ->queries(
-                        true: fn (Builder $query) => $query->confirmed(),
-                        false: fn (Builder $query) => $query->unconfirmed(),
-                        blank: fn (Builder $query) => $query,
+                        true: fn(Builder $query) => $query->confirmed(),
+                        false: fn(Builder $query) => $query->unconfirmed(),
+                        blank: fn(Builder $query) => $query,
                     ),
                 Tables\Filters\SelectFilter::make('year')
                     ->label('年')
-                    ->options(fn () => OvertimeConfirmation::query()
+                    ->options(fn() => OvertimeConfirmation::query()
                         ->selectRaw('DISTINCT(year)')
                         ->orderByDesc('year')
                         ->pluck('year')
-                        ->mapWithKeys(fn (string $year):array => [$year => $year . '年'])
+                        ->mapWithKeys(fn(string $year): array => [$year => $year . '年'])
                     ),
                 Tables\Filters\SelectFilter::make('month')
                     ->label('月')
-                    ->options(fn () => OvertimeConfirmation::query()
+                    ->options(fn() => OvertimeConfirmation::query()
                         ->selectRaw('DISTINCT(month)')
                         ->orderByDesc('month')
                         ->pluck('month')
-                        ->mapWithKeys(fn (string $month):array => [$month => $month . '月'])
-                    )
+                        ->mapWithKeys(fn(string $month): array => [$month => $month . '月'])
+                    ),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

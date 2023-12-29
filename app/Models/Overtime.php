@@ -4,16 +4,16 @@ namespace App\Models;
 
 use App\Enums\OvertimeReason;
 use Carbon\Carbon;
+use Filament\Tables;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Filament\Tables;
 
 class Overtime extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'uuid',
@@ -41,7 +41,7 @@ class Overtime extends Model
     {
         parent::booting();
 
-        static::creating(function (Overtime $overtime) {
+        static::creating(function(Overtime $overtime) {
             $overtime->uuid = \Str::uuid();
         });
     }
@@ -93,7 +93,7 @@ class Overtime extends Model
     public function timeDifference(): Attribute
     {
         return Attribute::make(
-            get: function () {
+            get: function() {
                 $timeFrom = Carbon::parse($this->date->format('Y-m-d') . ' ' . $this->time_from);
                 $timeUntil = Carbon::parse($this->date->format('Y-m-d') . ' ' . $this->time_until);
 

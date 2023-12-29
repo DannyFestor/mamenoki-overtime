@@ -3,18 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\OvertimeResource\Pages;
-use App\Filament\Resources\OvertimeResource\RelationManagers;
 use App\Models\Overtime;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Livewire\Component;
-use Livewire\Livewire;
 
 class OvertimeResource extends Resource
 {
@@ -23,7 +19,9 @@ class OvertimeResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
 
     protected static ?string $navigationGroup = '残業申請系';
+
     protected static ?int $navigationSort = 1;
+
     protected static ?string $navigationLabel = '申請内容管理';
 
     public static function form(Form $form): Form
@@ -80,12 +78,12 @@ class OvertimeResource extends Resource
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->requiresConfirmation()
-                        ->visible(fn (Component $livewire) => $livewire->activeTab === 'applied')
-                        ->action(fn (Collection $records) => $records->each(fn (Overtime $overtime) => $overtime->update([
+                        ->visible(fn(Component $livewire) => $livewire->activeTab === 'applied')
+                        ->action(fn(Collection $records) => $records->each(fn(Overtime $overtime) => $overtime->update([
                             'approved_at' => now(),
                             'approval_user_id' => \Auth::id(),
                         ])))
-                        ->deselectRecordsAfterCompletion()
+                        ->deselectRecordsAfterCompletion(),
                 ]),
             ]);
     }

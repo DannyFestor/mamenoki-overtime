@@ -6,11 +6,10 @@ use App\Enums\OvertimeReason;
 use App\Models\Overtime;
 use App\Models\OvertimeConfirmation;
 use Carbon\Carbon;
-use Illuminate\Validation\Rule;
-use Livewire\Attributes\Reactive;
-use Livewire\Form;
-use Filament\Notifications\Notification;
 use Filament\Notifications\Actions\Action;
+use Filament\Notifications\Notification;
+use Illuminate\Validation\Rule;
+use Livewire\Form;
 
 class OvertimeForm extends Form
 {
@@ -69,11 +68,6 @@ class OvertimeForm extends Form
         ];
     }
 
-    /**
-     * @param int $userId
-     * @param Carbon $dateObject
-     * @return OvertimeConfirmation
-     */
     private function getOvertimeConfirmationForUserAndDate(int $userId, Carbon $dateObject): OvertimeConfirmation
     {
         $prevDateObject = $dateObject->clone()->subMonth();
@@ -95,12 +89,10 @@ class OvertimeForm extends Form
             ], [
                 'remarks' => $previousMonthOvertimeConfirmation?->transfer_remarks,
             ]);
+
         return $overtimeConfirmation;
     }
 
-    /**
-     * @return void
-     */
     private function sendAlreadyApprovedNotification(): void
     {
         Notification::make()
@@ -118,12 +110,6 @@ class OvertimeForm extends Form
             ->send();
     }
 
-    /**
-     * @param Carbon $dateObject
-     * @param bool $isApplied
-     * @param bool $recentlyCreated
-     * @return void
-     */
     private function sendSuccessNotification(Carbon $dateObject, bool $isApplied, bool $recentlyCreated): void
     {
         $notification = $dateObject->format('Y年m月d日') . 'の残業を';
@@ -167,6 +153,7 @@ class OvertimeForm extends Form
         if ($overtime === null) {
             $this->date = $date;
             $this->reset(['timeFrom', 'timeUntil', 'reason', 'remarks']);
+
             return false;
         }
 

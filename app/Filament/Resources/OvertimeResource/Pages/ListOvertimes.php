@@ -5,8 +5,8 @@ namespace App\Filament\Resources\OvertimeResource\Pages;
 use App\Filament\Resources\OvertimeResource;
 use App\Models\Overtime;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Components\Tab;
+use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListOvertimes extends ListRecords
@@ -19,7 +19,6 @@ class ListOvertimes extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
-
 
     public function getTabs(): array
     {
