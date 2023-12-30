@@ -142,6 +142,7 @@ class Overtime extends Model
                         ->label('作成者')
                         ->relationship('creator', 'name')
                         ->searchable()
+                        ->preload()
                         ->required(),
 
                     Forms\Components\DateTimePicker::make('created_at')
@@ -157,6 +158,7 @@ class Overtime extends Model
                         ->label('申請者')
                         ->relationship('applicant', 'name')
                         ->searchable()
+                        ->preload()
                         ->required(),
 
                     Forms\Components\DateTimePicker::make('applied_at')
@@ -172,6 +174,7 @@ class Overtime extends Model
                         ->label('承認者')
                         ->relationship('approver', 'name')
                         ->searchable()
+                        ->preload()
                         ->required(),
 
                     Forms\Components\DateTimePicker::make('approved_at')

@@ -36,9 +36,35 @@ class OvertimeResource extends Resource
             ->columns(Overtime::filamentTable())
             ->defaultSort('date', 'DESC')
             ->filters([
+                Tables\Filters\SelectFilter::make('year')
+                    ->label('年')
+                    ->options(function() {
+                        $v = [];
+                        for ($i = now()->year; $i >= 2000; $i--) {
+                            $v[$i] = $i . '年';
+                        }
+
+                        return $v;
+                    }),
+                Tables\Filters\SelectFilter::make('month')
+                    ->label('月')
+                    ->options(function() {
+                        $v = [];
+                        for ($i = 1; $i <= 12; $i++) {
+                            $v[$i] = $i . '月';
+                        }
+
+                        return $v;
+                    }),
+                Tables\Filters\SelectFilter::make('creator')
+                    ->label('作成者')
+                    ->relationship('creator', 'name'),
                 Tables\Filters\SelectFilter::make('applicant')
                     ->label('申請者')
                     ->relationship('applicant', 'name'),
+                Tables\Filters\SelectFilter::make('approver')
+                    ->label('承認者')
+                    ->relationship('approver', 'name'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

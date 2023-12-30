@@ -27,23 +27,58 @@ class OvertimeConfirmationResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->relationship('user', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->required(),
-                Forms\Components\TextInput::make('year')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('month')
-                    ->required(),
-                Forms\Components\Textarea::make('remarks')
-                    ->maxLength(65535)
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('transfer_remarks')
-                    ->maxLength(65535)
-                    ->columnSpanFull(),
-                Forms\Components\DateTimePicker::make('confirmed_at'),
+                Forms\Components\Section::make('基本情報')
+                    ->schema([
+                        Forms\Components\Select::make('user_id')
+                            ->relationship('user', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                        Forms\Components\Select::make('year')
+                            ->label('年')
+                            ->options(function(): array {
+                                $v = [];
+                                for ($i = now()->year; $i >= 2000; $i--) {
+                                    $v[$i] = "{$i}年";
+                                }
+
+                                return $v;
+                            })
+                            ->required(),
+                        Forms\Components\Select::make('month')
+                            ->label('月')
+                            ->options(function(): array {
+                                $v = [];
+                                for ($i = 1; $i <= 12; $i++) {
+                                    $v[$i] = "{$i}月";
+                                }
+
+                                return $v;
+                            })
+                            ->required(),
+                    ])->columns(3),
+                Forms\Components\Section::make()
+                    ->schema([
+                        Forms\Components\Textarea::make('remarks')
+                            ->label('備考欄')
+                            ->hint('当月分')
+                            ->maxLength(65535)
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make('transfer_remarks')
+                            ->label('引継ぎ欄')
+                            ->hint('ここに記入したことは来月の「備考欄」に反映されます')
+                            ->maxLength(65535)
+                            ->columnSpanFull(),
+                    ]),
+
+                Forms\Components\Section::make()
+                    ->schema([
+                        Forms\Components\DateTimePicker::make('confirmed_at')
+                            ->label('最終確認日')
+                            ->date()
+                            ->nullable()
+                            ->native(false),
+                    ]),
             ]);
     }
 

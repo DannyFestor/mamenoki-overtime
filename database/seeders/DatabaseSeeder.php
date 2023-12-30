@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'danny@festor.info',
         ]);
 
-        User::factory(10)->create();
+        User::factory(100)->create();
 
         $users = User::all();
 
