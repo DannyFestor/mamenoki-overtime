@@ -30,20 +30,24 @@
                 {{ now()->year }}年{{ str_pad(now()->month, 2, '0', STR_PAD_LEFT) }}月
             </a>
             @foreach($overtimeConfirmationsPerYear as $confirmationYear => $yearlyOvertimeConfirmations)
-            <div x-data="{ expanded: false }" wire:key="overtime-confirmations-{{ $confirmationYear }}">
-                <div @click="expanded = !expanded" class="font-bold text-center px-4 py-2 bg-slate-200 hover:bg-slate-300 cursor-pointer">{{ $confirmationYear }}年度</div>
-                <div x-show="expanded" x-collapse class="flex flex-col">
-                @foreach($yearlyOvertimeConfirmations as $yearlyOvertimeConfirmation)
-                    <a wire:navigate
-                       wire:key="overtime-confirmation-{{ $yearlyOvertimeConfirmation['year'] }}-{{ $yearlyOvertimeConfirmation['month'] }}"
-                       href="{{ route('overtime.index', ['year' => $yearlyOvertimeConfirmation['year'], 'month' => $yearlyOvertimeConfirmation['month']]) }}"
-                       class="px-4 py-2 hover:bg-sky-200 text-right"
-                    >
-                        {{ $yearlyOvertimeConfirmation['year'] }}年{{ str_pad($yearlyOvertimeConfirmation['month'], 2, '0', STR_PAD_LEFT) }}月
-                    </a>
-                @endforeach
+                <div x-data="{ expanded: false }" wire:key="overtime-confirmations-{{ $confirmationYear }}">
+                    <div @click="expanded = !expanded"
+                         class="font-bold text-center px-4 py-2 bg-slate-200 hover:bg-slate-300 cursor-pointer">{{ $confirmationYear }}
+                        年度
+                    </div>
+                    <div x-show="expanded" x-collapse class="flex flex-col">
+                        @foreach($yearlyOvertimeConfirmations as $yearlyOvertimeConfirmation)
+                            <a wire:navigate
+                               wire:key="overtime-confirmation-{{ $yearlyOvertimeConfirmation['year'] }}-{{ $yearlyOvertimeConfirmation['month'] }}"
+                               href="{{ route('overtime.index', ['year' => $yearlyOvertimeConfirmation['year'], 'month' => $yearlyOvertimeConfirmation['month']]) }}"
+                               class="px-4 py-2 hover:bg-sky-200 text-right"
+                            >
+                                {{ $yearlyOvertimeConfirmation['year'] }}
+                                年{{ str_pad($yearlyOvertimeConfirmation['month'], 2, '0', STR_PAD_LEFT) }}月
+                            </a>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
             @endforeach
         </div>
 
@@ -81,9 +85,11 @@
 
         <div class="order-2 sm:order-1 p-4 w-full sm:w-1/2 flex flex-col justify-center items-center">
             <div wire:loading>
-                <svg class="animate-spin -ml-1 mr-3 h-16 w-16 text-slate-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg class="animate-spin -ml-1 mr-3 h-16 w-16 text-slate-900" xmlns="http://www.w3.org/2000/svg"
+                     fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <path class="opacity-75" fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
             </div>
 
@@ -107,6 +113,21 @@
                         </div>
                     </div>
                 @endif
+
+                @if($uuid !== '' && $form->confirmed_at)
+                    <a href="{{ route('overtime.show', ['overtime_confirmation' => $uuid]) }}"
+                       class="border-2 border-sky-900 mt-4 flex transition-all hover:scale-105 px-4 py-2 flex justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                             stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+                        </svg>
+
+                        PDF Download
+                    </a>
+                @endif
+
+                @json($uuid)
             </div>
         </div>
 
@@ -115,13 +136,15 @@
                 <label for="form_remarks">
                     備考欄（当月分）
                 </label>
-                <textarea @if(!$form->confirmed_at || $form->confirmed_at === '') disabled @endif id="form_remarks" rows="3" class="form-textarea" wire:model="form.remarks"></textarea>
+                <textarea @if(!$form->confirmed_at || $form->confirmed_at === '') disabled @endif id="form_remarks"
+                          rows="3" class="form-textarea" wire:model="form.remarks"></textarea>
             </div>
             <div class="flex flex-col">
                 <label for="form_transfer_remarks">
                     引継ぎ欄<span class="text-xs">（ここに記入したことは来月の「備考欄」に反映されます）</span>
                 </label>
-                <textarea @if(!$form->confirmed_at || $form->confirmed_at === '') disabled @endif rows="3" class="form-textarea" wire:model="form.transfer_remarks"></textarea>
+                <textarea @if(!$form->confirmed_at || $form->confirmed_at === '') disabled @endif rows="3"
+                          class="form-textarea" wire:model="form.transfer_remarks"></textarea>
             </div>
         </div>
 
@@ -141,7 +164,9 @@
                         キャンセル
                     </button>
 
-                    <button class="rounded-xl border-2 border-blue-800 px-4 py-2 min-w-32 bg-blue-700 text-white font-bold text-lg" type="submit">
+                    <button
+                        class="rounded-xl border-2 border-blue-800 px-4 py-2 min-w-32 bg-blue-700 text-white font-bold text-lg"
+                        type="submit">
                         確認
                     </button>
                 </div>

@@ -5,6 +5,7 @@ namespace App\Livewire\Overtime;
 use App\Livewire\Forms\OvertimeConfirmationForm;
 use App\Models\Overtime;
 use App\Models\OvertimeConfirmation;
+use Auth;
 use Carbon\Carbon;
 use IntlDateFormatter;
 use Livewire\Attributes\Computed;
@@ -24,6 +25,8 @@ class Index extends Component
     public array $overtimeConfirmationsPerYear = [];
 
     public OvertimeConfirmationForm $form;
+
+    public string $uuid = '';
 
     public function mount()
     {
@@ -49,11 +52,11 @@ class Index extends Component
             $this->month = now()->month;
         }
 
-        $this->name = \Auth::user()->name;
+        $this->name = Auth::user()->name;
 
         $this->overtimeConfirmationsPerYear = OvertimeConfirmation::query()
             ->select(['year', 'month'])
-            ->where(['user_id' => \Auth::user()->id])
+            ->where(['user_id' => Auth::user()->id])
             ->orderBy('year', 'desc')
             ->orderBy('month', 'desc')
             ->get()
@@ -64,7 +67,7 @@ class Index extends Component
     public function render()
     {
         // TODO: ADMIN CAN SELECT DIFFERENT USERS
-        $user = \Auth::user();
+        $user = Auth::user();
 
         $previousMonthOvertimeConfirmation = OvertimeConfirmation::where([
             'user_id' => $user->id,
@@ -99,19 +102,28 @@ class Index extends Component
                     return 'saved';
                 });
 
+            $this->uuid = $overtimeConfirmation->uuid ?? '';
+        } else {
+            $this->uuid = '';
         }
 
         $this->form->setForm($overtimeConfirmation);
 
         return view('livewire.overtime.index', [
             'overtimes' => $overtimes,
-            'user' => \Auth::user(),
+            'user' => Auth::user(),
         ]);
+    }
+
+    #[Computed]
+    public function previousMonth(): Carbon
+    {
+        return Carbon::parse($this->year . '-' . $this->month)->startOfMonth()->subMonth();
     }
 
     public function submit()
     {
-        $this->form->save(\Auth::id(), $this->year, $this->month);
+        $this->form->save(Auth::id(), $this->year, $this->month);
     }
 
     public function decreaseYear(): void
@@ -155,12 +167,6 @@ class Index extends Component
             'year' => ['except' => now()->year],
             'month' => ['except' => now()->month],
         ];
-    }
-
-    #[Computed]
-    public function previousMonth(): Carbon
-    {
-        return Carbon::parse($this->year . '-' . $this->month)->startOfMonth()->subMonth();
     }
 
     #[Computed]

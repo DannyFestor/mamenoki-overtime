@@ -6,6 +6,7 @@ namespace Database\Seeders;
 use App\Models\Overtime;
 use App\Models\OvertimeConfirmation;
 use App\Models\User;
+use App\Models\UserWorkInformation;
 use Carbon\Carbon;
 use Faker\Factory;
 use Illuminate\Database\Seeder;
@@ -17,12 +18,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
-            'name' => 'Danny',
-            'email' => 'danny@festor.info',
-        ]);
+        User::factory()
+            ->has(UserWorkInformation::factory())
+            ->create([
+                'name' => 'Danny',
+                'email' => 'danny@festor.info',
+            ]);
 
-        User::factory(100)->create();
+        User::factory(100)->has(UserWorkInformation::factory())->create();
 
         $users = User::all();
 
