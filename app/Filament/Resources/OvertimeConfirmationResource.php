@@ -95,16 +95,6 @@ class OvertimeConfirmationResource extends Resource
                     ->relationship('user', 'name')
                     ->searchable()
                     ->preload(),
-                Tables\Filters\TernaryFilter::make('confirmed_at')
-                    ->label('最終確認ずみ')
-                    ->placeholder('全ての件')
-                    ->trueLabel('最終確認済みのみ')
-                    ->falseLabel('最終確認済み以外')
-                    ->queries(
-                        true: fn(Builder $query) => $query->confirmed(),
-                        false: fn(Builder $query) => $query->unconfirmed(),
-                        blank: fn(Builder $query) => $query,
-                    ),
                 Tables\Filters\SelectFilter::make('year')
                     ->label('年')
                     ->options(fn() => OvertimeConfirmation::query()
