@@ -6,6 +6,7 @@ use App\Livewire\Forms\OvertimeForm;
 use App\Models\OvertimeConfirmation;
 use Auth;
 use Carbon\Carbon;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Livewire\Component;
 use Throwable;
@@ -59,7 +60,7 @@ class Create extends Component
             ->exists();
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.overtime.create');
     }
