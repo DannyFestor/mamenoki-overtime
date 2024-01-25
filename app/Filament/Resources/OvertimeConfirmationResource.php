@@ -9,7 +9,9 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
+use Spatie\Browsershot\Browsershot;
 
 class OvertimeConfirmationResource extends Resource
 {
@@ -121,6 +123,40 @@ class OvertimeConfirmationResource extends Resource
                     ),
             ])
             ->actions([
+                Tables\Actions\Action::make('test')
+                    ->label('PDF発行')
+                    ->color('success')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->visible(fn(OvertimeConfirmation $record) => $record->confirmed_at !== null)
+                    ->action(function(OvertimeConfirmation $record) {
+                        $record->load([
+                            'overtimes' => fn(HasMany $query) => $query
+                                ->whereNotNull('applied_at')
+                                ->whereNotNull('approved_at'),
+                            'user',
+                            'user.userWorkInformation',
+                        ]);
+
+                        $html = view('overtime_confirmation.show', [
+                            'overtimeConfirmation' => $record,
+                            'user' => $record->user,
+                        ])->render();
+
+                        $pdf = Browsershot::html($html)
+                            ->showBackground()
+                            ->margins(10, 10, 10, 10)
+                            ->pdf();
+
+                        $filename = $record->year . '-' . Str::padLeft(
+                            $record->month,
+                            2,
+                            '0'
+                        ) . '-' . $record->user->name . '.pdf';
+
+                        return response()->streamDownload(function() use ($pdf) {
+                            echo $pdf;
+                        }, $filename);
+                    }),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
