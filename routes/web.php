@@ -1,9 +1,9 @@
 <?php
 
+use App\Http\Controllers\OvertimeConfirmation\ShowController;
 use App\Livewire\Dashboard;
 use App\Livewire\Overtime\Create;
 use App\Livewire\Overtime\Index;
-use App\Livewire\Overtime\Show;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,7 +26,7 @@ Route::get('/dashboard', Dashboard::class)->middleware(['auth', 'verified'])->na
 Route::group(['as' => 'overtime.', 'prefix' => 'overtime', 'middleware' => ['auth', 'verified']], function() {
     Route::get('/', Index::class)->name('index');
     Route::get('/create', Create::class)->name('create');
-    Route::get('/{overtime_confirmation:uuid}', Show::class)->can('view', 'overtime_confirmation')->name('show');
+    Route::get('/{overtime_confirmation:uuid}', ShowController::class)->can('view', 'overtime_confirmation')->name('show');
 });
 
 //Route::middleware('auth')->group(function () {

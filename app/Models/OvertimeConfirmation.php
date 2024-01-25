@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use IntlDateFormatter;
+use Str;
 
 class OvertimeConfirmation extends Model
 {
@@ -33,28 +37,8 @@ class OvertimeConfirmation extends Model
         parent::booting();
 
         static::creating(function(OvertimeConfirmation $overtimeConfirmation) {
-            $overtimeConfirmation->uuid = \Str::uuid();
+            $overtimeConfirmation->uuid = Str::uuid();
         });
-    }
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function overtimes(): HasMany
-    {
-        return $this->hasMany(Overtime::class, 'overtime_confirmation_id');
-    }
-
-    public function scopeConfirmed(Builder $builder): Builder
-    {
-        return $builder->whereNotNull('confirmed_at');
-    }
-
-    public function scopeUnconfirmed(Builder $builder): Builder
-    {
-        return $builder->whereNull('confirmed_at');
     }
 
     public static function filamentTable(): array
@@ -107,5 +91,43 @@ class OvertimeConfirmation extends Model
                 ->sortable()
                 ->toggleable(isToggledHiddenByDefault: true),
         ];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function overtimes(): HasMany
+    {
+        return $this->hasMany(Overtime::class, 'overtime_confirmation_id');
+    }
+
+    public function scopeConfirmed(Builder $builder): Builder
+    {
+        return $builder->whereNotNull('confirmed_at');
+    }
+
+    public function scopeUnconfirmed(Builder $builder): Builder
+    {
+        return $builder->whereNull('confirmed_at');
+    }
+
+    public function japaneseYear(): Attribute
+    {
+        return Attribute::make(
+            get: function(mixed $value, array $attributes) {
+                $formatter = new IntlDateFormatter(
+                    'ja_JP@calendar=japanese', IntlDateFormatter::FULL,
+                    IntlDateFormatter::NONE, 'Asia/Tokyo', IntlDateFormatter::TRADITIONAL
+                );
+
+                $dateString = $formatter->format(Carbon::parse($attributes['year'] . '-' . $attributes['month']));
+
+                $dateString = substr($dateString, 0, strpos($dateString, '年'));
+
+                return $dateString;
+            }
+        );
     }
 }
