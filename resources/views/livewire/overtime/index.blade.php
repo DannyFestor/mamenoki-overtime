@@ -116,6 +116,7 @@
 
                 @if($uuid !== '' && $form->confirmed_at)
                     <a href="{{ route('overtime.show', ['overtime_confirmation' => $uuid]) }}"
+                       target="_blank"
                        class="border-2 border-sky-900 mt-4 flex transition-all hover:scale-105 px-4 py-2 flex justify-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                              stroke="currentColor" class="w-6 h-6">
